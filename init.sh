@@ -14,7 +14,8 @@ brew install curl
 
 # Install and config git
 brew install git
-# TODO: Add git config and setup
+brew install gh
+gh auth login
 
 # Install fonts
 brew tap homebrew/cask-fonts
@@ -68,7 +69,6 @@ brew install --cask rectangle
 brew install --cask maccy
 brew install --cask protonvpn
 brew install direnv
-brew install gh
 brew install qmk
 
 # Languages
@@ -108,9 +108,10 @@ brew install kubectx
 brew install asdf
 asdf install kubectl latest
 
-# TODO: copy .zshrc
+# Download dotfiles
+curl -o ~/.zshrc https://raw.githubusercontent.com/maurokinderknecht/dotfiles/main/.zshrc
 
 # Create folder structure
-mkdir files
-cd files
+mkdir ~/files
+cd ~/files
 mkdir projects sandbox work
