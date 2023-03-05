@@ -1,195 +1,73 @@
 #!/bin/bash
 
-color_reset=$(tput sgr0)
-color_red=$(tput setaf 1)
-color_green=$(tput setaf 2)
-color_yellow=$(tput setaf 3)
-color_blue=$(tput setaf 4)
-
-e_failure() {
-  printf "${color_red}🔴  %s${color_reset}" "$@"
-  printf "\n"
-}
-
-e_pending() {
-  printf "${color_yellow}⏳  %s...${color_reset}" "$@"
-  printf "\n"
-}
-
-e_success() {
-  printf "${color_green}🟢  %s${color_reset}" "$@"
-  printf "\n"
-}
-
-e_message() {
-  printf "\n"
-  printf "${color_blue}✨  %s${color_reset}" "$@"
-  printf "\n\n"
-}
-
-brew_install() {
-  if ! has_brew $1; then
-    e_pending "Installing $1"
-    brew install $1 > /dev/null
-    test_brew $1
-    if ! [ -z "$2" ]; then
-      $2
-    fi
-  fi
-}
-
-brew_cask_install() {
-  if ! has_cask $1; then
-    e_pending "Installing $1"
-    brew install --cask $1 > /dev/null
-    test_cask $1
-  fi
-}
-
-has_command() {
-  if [ $(type -P $1) ]; then
-    return 0
-  fi
-  return 1
-}
-
-test_command() {
-  if has_command $1; then
-    e_success "$1"
-  else
-    e_failure "$1"
-  fi
-}
-
-has_brew() {
-  if $(brew ls --versions $1 > /dev/null); then
-    return 0
-  fi
-  return 1
-}
-
-test_brew() {
-  if has_brew $1; then
-    e_success "$1"
-  else
-    e_failure "$1"
-  fi
-}
-
-has_path() {
-  local path="$@"
-  if [ -e "$HOME/$path" ]; then
-    return 0
-  fi
-  return 1
-}
-
-test_path() {
-  # local path=$(echo "$@" | sed 's:.*/::')
-  if has_path $1; then
-    # e_success "$path"
-    e_success "$1"
-  else
-    # e_failure "$path"
-    e_failure "$1"
-  fi
-}
-
-has_cask() {
-  if $(brew ls --cask $1 &> /dev/null); then
-    return 0
-  fi
-  return 1
-}
-
-test_cask() {
-  if has_cask $1; then
-    e_success "$1"
-  else
-    e_failure "$1"
-  fi
-}
-
-has_app() {
-  local name="$@"
-  if [ -e "/Applications/$name.app" ]; then
-    return 0
-  fi
-  return 1
-}
-
-test_app() {
-  if has_app $1; then
-    e_success "$1"
-  else
-    e_failure "$1"
-  fi
-}
-
-has_arm() {
-  if [[ $(uname -p) == 'arm' ]]; then
-    return 0
-  fi
-  return 1
-}
-
-has_consent() {
-  if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-    return 0
-  fi
-  return 1
-}
-
-get_consent() {
-  printf "❔  %s? [y/n]:" "$@"
-  read -p " " -n 1
-  printf "\n"
-}
-
-zprofile() {
-  if [ -z "$2" ]; then
-    echo "# $2" >> $HOME/.zprofile
-  fi
-  echo $1 >> $HOME/.zprofile
-  echo "" >> $HOME/.zprofile
-}
-
-zshrc() {
-  if ! [ -z "$2" ]; then
-    echo "" >> $HOME/.zshrc
-    echo "# $2" >> $HOME/.zshrc
-  fi
-  echo $1 >> $HOME/.zshrc
-}
-
-# ------------------------------------------------------------------------------
 e_message "Starting setup"
-# ------------------------------------------------------------------------------
 
+e_message "MacOS setup"
+
+# Ask for sudo access upfront, so it doesn't hold unattended setup later
+sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# Check OS is MacOS
 if ! [[ "${OSTYPE}" == "darwin"* ]]; then
-  e_failure "Unsupported operating system (macOS only)"
+  e_failure "Unsupported operating system. This setup is only available for MacOS"
   exit 1
 fi
 
-get_consent "Autohide Dock"
-if has_consent; then
-  e_pending "Autohiding Dock"
-  defaults write com.apple.dock autohide -boolean true
-  killall Dock
-fi
+# Close any open System Preferences window to prevent overriding settings
+osascript -e 'tell application "System Preferences" to quit'
 
-get_consent "Display hidden Finder files/folders"
-if has_consent; then
-  e_pending "Displaying hidden Finder files/folders"
-  defaults write com.apple.finder AppleShowAllFiles -boolean true
-  killall Finder
+if ! has_variable "GLOBAL_CONFIG"; then
+  e_pending "Setting Global config"
+  defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 1
+  defaults write NSGlobalDomain AppleShowScrollBars -string "WhenScrolling"
+  defaults write NSGlobalDomain AppleActionOnDoubleClick -string "None"
+  defaults write NSGlobalDomain AppleMenuBarVisibleInFullscreen -boolean true
+  defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -boolean false
+  defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -boolean false
+  zshrc "export GLOBAL_CONFIG"
 fi
+e_success "Global config completed"
+
+# Configure dock
+if ! has_variable "DOCK_CONFIG"; then
+  e_pending "Setting Dock config"
+  defaults write com.apple.dock autohide -boolean true
+  defaults write com.apple.dock dblclickbehavior -string "none"
+  defaults write com.apple.dock largesize -integer 80
+  defaults write com.apple.dock launchanim -boolean true
+  defaults write com.apple.dock magnification -boolean true
+  defaults write com.apple.dock mineffect -string "genie"
+  defaults write com.apple.dock minimize-to-application -boolean true
+  defaults write com.apple.dock orientation -string "left"
+  defaults write com.apple.dock show-process-indicators -boolean true
+  defaults write com.apple.dock show-recents -string false
+  defaults write com.apple.dock static-only -boolean true
+  defaults write com.apple.dock tilesize -integer 60
+  killall Dock
+  zshrc "export DOCK_CONFIG=true"
+fi
+e_success "Dock config completed"
+
+# Configure finder
+if ! has_variable "FINDER_CONFIG"; then
+  e_pending "Configuring Finder"
+  defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -boolean false
+  defaults write com.apple.finder ShowHardDrivesOnDesktop -boolean false
+  defaults write com.apple.finder ShowMountedServersOnDesktop -boolean false
+  defaults write com.apple.finder ShowRemovableMediaOnDesktop -boolean false
+  defaults write com.apple.finder WarnOnEmptyTrash -boolean false
+  killall Finder
+  zshrc "export FINDER_CONFIG=true"
+fi
+e_success "Finder configured"
 
 if ! has_path "files"; then
   e_pending "Creating ~/files folder"
   mkdir -p ~/files ~/files/sandbox ~/files/projects ~/files/work
   test_path "files"
 fi
+e_success "~/files folder created"
 
 if ! has_command "xcode-select"; then
   e_pending "Installing xcode-select (CLI tools)"
