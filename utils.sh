@@ -144,7 +144,3 @@ zshrc() {
   echo $1 >> $HOME/.zshrc
   source $HOME/.zshrc
 }
-
-has_variable() {
-  
-}
