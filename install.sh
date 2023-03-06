@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 color_reset=$(tput sgr0)
 color_red=$(tput setaf 1)
@@ -172,6 +172,7 @@ fi
 
 # Source zshrc to make sure we have all existing config available
 source ~/.zshrc
+zsh
 
 e_message "Setting macOS defaults"
 
@@ -245,6 +246,7 @@ if ! has_command "brew"; then
   brew doctor
   brew tap homebrew/cask-fonts
   test_command "brew"
+  zsh
 fi
 e_success "brew (Homebrew) installed"
 
