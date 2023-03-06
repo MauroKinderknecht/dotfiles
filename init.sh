@@ -1,8 +1,8 @@
 #!/bin/bash
 
-e_message "Starting setup"
+source utils.sh
 
-e_message "MacOS setup"
+e_message "Starting setup"
 
 # Ask for sudo access upfront, so it doesn't hold unattended setup later
 sudo -v
@@ -13,6 +13,11 @@ if ! [[ "${OSTYPE}" == "darwin"* ]]; then
   e_failure "Unsupported operating system. This setup is only available for MacOS"
   exit 1
 fi
+
+# Source zshrc to make sure we have all existing config available
+source ~/.zshrc
+
+e_message "Setting macOS defaults"
 
 # Close any open System Preferences window to prevent overriding settings
 osascript -e 'tell application "System Preferences" to quit'
@@ -25,7 +30,7 @@ if ! has_variable "GLOBAL_CONFIG"; then
   defaults write NSGlobalDomain AppleMenuBarVisibleInFullscreen -boolean true
   defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -boolean false
   defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -boolean false
-  zshrc "export GLOBAL_CONFIG"
+  zshrc "export GLOBAL_CONFIG=true"
 fi
 e_success "Global config completed"
 
@@ -41,7 +46,7 @@ if ! has_variable "DOCK_CONFIG"; then
   defaults write com.apple.dock minimize-to-application -boolean true
   defaults write com.apple.dock orientation -string "left"
   defaults write com.apple.dock show-process-indicators -boolean true
-  defaults write com.apple.dock show-recents -string false
+  defaults write com.apple.dock show-recents -boolean false
   defaults write com.apple.dock static-only -boolean true
   defaults write com.apple.dock tilesize -integer 60
   killall Dock
@@ -51,7 +56,7 @@ e_success "Dock config completed"
 
 # Configure finder
 if ! has_variable "FINDER_CONFIG"; then
-  e_pending "Configuring Finder"
+  e_pending "Setting Finder config"
   defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -boolean false
   defaults write com.apple.finder ShowHardDrivesOnDesktop -boolean false
   defaults write com.apple.finder ShowMountedServersOnDesktop -boolean false
@@ -60,8 +65,9 @@ if ! has_variable "FINDER_CONFIG"; then
   killall Finder
   zshrc "export FINDER_CONFIG=true"
 fi
-e_success "Finder configured"
+e_success "Finder config completed"
 
+# Configure folder structure
 if ! has_path "files"; then
   e_pending "Creating ~/files folder"
   mkdir -p ~/files ~/files/sandbox ~/files/projects ~/files/work
@@ -69,12 +75,17 @@ if ! has_path "files"; then
 fi
 e_success "~/files folder created"
 
+e_message "Installing base tools"
+
+# Install Xcode Command Line Tools
 if ! has_command "xcode-select"; then
-  e_pending "Installing xcode-select (CLI tools)"
+  e_pending "Installing xcode-select"
   xcode-select --install
   test_command "xcode-select"
 fi
+e_success "xcode-select installed"
 
+# Install Homebrew
 if ! has_command "brew"; then
   e_pending "Installing brew (Homebrew)"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" > /dev/null
@@ -86,20 +97,17 @@ if ! has_command "brew"; then
   brew tap homebrew/cask-fonts
   test_command "brew"
 fi
+e_success "brew (Homebrew) installed"
 
-# ------------------------------------------------------------------------------
 e_message "Installing fonts"
-# ------------------------------------------------------------------------------
 
+# Fonts
 brew_cask_install "font-jetbrains-mono"
 
-# ------------------------------------------------------------------------------
 e_message "Installing tools"
-# ------------------------------------------------------------------------------
 
 # Tools
 brew_install "watchman"
-
 brew_install "trash"
 
 if ! has_brew "curl"; then
@@ -117,7 +125,10 @@ brew_install "thefuck"
 # Git
 brew_install "git"
 
-brew_install "gh" "gh auth login"
+if ! has_brew "gh"; then
+  brew_install "gh"
+  gh auth login
+fi
 
 # Install oh-my-zsh
 brew_install "zsh"
@@ -195,6 +206,8 @@ if ! has_command "go"; then
   zshrc 'export GOROOT="$(brew --prefix golang)/libexec"'
   zshrc 'export PATH=$PATH:$GOPATH/bin'
   zshrc 'export PATH=$PATH:$GOROOT/bin'
+else
+  e_success "golang installed"
 fi
 
 brew_install "protobuf"
@@ -208,6 +221,8 @@ if has_path ".sdkman"; then
   zshrc 'export SDKMAN_DIR="$HOME/.sdkman"' "sdkman config"
   zshrc '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"'
   sdk install java > /dev/null
+else
+  e_success "sdkman installed"
 fi
 
 brew_install "maven"
@@ -254,7 +269,8 @@ if ! has_path ".nvm"; then
   add-zsh-hook chpwd load-nvmrc
   load-nvmrc
 _EOF_
-
+else
+  e_success "nvm installed"
 fi
 
 brew_install "yarn"
@@ -264,7 +280,9 @@ if ! has_brew "python"; then
   brew_install "python"
   zshrc 'alias python=/usr/bin/python3' "python config"
   zshrc 'alias pip=/usr/bin/pip3'
-  zshrc 'eval "$(pyenv init -)"'
+  zshrc 'eval "$(pyenv init -)"']
+else
+  e_success "python installed"
 fi
 
 pip install --user pipenv
@@ -276,6 +294,4 @@ brew_install "pyenv"
 ## Terraform
 brew_install "terraform"
 
-# ------------------------------------------------------------------------------
 e_message "Setup complete"
-# ------------------------------------------------------------------------------

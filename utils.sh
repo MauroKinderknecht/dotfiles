@@ -24,7 +24,7 @@ e_success() {
 e_message() {
   printf "\n"
   printf "${color_blue}✨  %s${color_reset}" "$@"
-  printf "\n\n"
+  printf "\n"
 }
 
 has_command() {
@@ -115,16 +115,16 @@ brew_install() {
   if ! has_brew $1; then
     e_pending "Installing $1"
     brew install $1 > /dev/null
-    test_brew $1
   fi
+  test_brew $1
 }
 
 brew_cask_install() {
   if ! has_cask $1; then
     e_pending "Installing $1"
     brew install --cask $1 > /dev/null
-    test_cask $1
   fi
+  test_cask $1
 }
 
 zprofile() {
@@ -143,4 +143,11 @@ zshrc() {
   fi
   echo $1 >> $HOME/.zshrc
   source $HOME/.zshrc
+}
+
+has_variable() {
+  if [ -z "${!1}" ]; then
+    return 1
+  fi
+  return 0
 }
