@@ -6,8 +6,14 @@ e_message "Starting setup..."
 # Create .zshrc file
 touch ~/.zshrc
 
+# if exists .git in this dir
+if [ -d .git ]; then
+  e_pending "Updating dotfiles"
+  git pull origin main
+fi
+
 # Install XCode Command Line Tools
-if ! "$(xcode-select --print-path &> /dev/null)"; then
+if ! $(xcode-select --print-path &> /dev/null); then
   e_pending "Installing XCode Command Line Tools"
   xcode-select --install &> /dev/null
 
