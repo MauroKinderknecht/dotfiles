@@ -128,6 +128,9 @@ brew_cask_install() {
 }
 
 zprofile() {
+  if ! has_path ".zprofile"; then
+    touch $HOME/.zprofile
+  fi
   if [ -z "$2" ]; then
     echo "" >> $HOME/.zprofile
     echo "# $2" >> $HOME/.zprofile
@@ -137,6 +140,9 @@ zprofile() {
 }
 
 zshrc() {
+  if ! has_path ".zshrc"; then
+    touch $HOME/.zshrc
+  fi
   if ! [ -z "$2" ]; then
     echo "" >> $HOME/.zshrc
     echo "# $2" >> $HOME/.zshrc
