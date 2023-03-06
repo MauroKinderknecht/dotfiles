@@ -14,7 +14,7 @@ fi
 e_success "XCode Command Line Tools installed"
 
 # Install Homebrew
-if ! $(which brew); then
+if ! $(which brew &> /dev/null); then
   e_pending "Installing Homebrew"
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   brew doctor
