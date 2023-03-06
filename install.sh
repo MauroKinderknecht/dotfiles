@@ -1,15 +1,29 @@
 #!/bin/bash
+source _logger.sh
 
-touch .zshrc
+e_message "Starting setup..."
 
-xcode-select --install
-sleep 1
-osascript <<EOD
-  tell application "System Events"
-    tell process "Install Command Line Developer Tools"
-      keystroke return
-      click button "Agree" of window "License Agreement"
-    end tell
-  end tell
-EOD
-echo "XCODE=true" >> .zshrc
+# Create .zshrc file
+touch ~/.zshrc
+
+# Install XCode Command Line Tools
+if ! "$(xcode-select --print-path &> /dev/null)"; then
+  e_pending "Installing XCode Command Line Tools"
+  xcode-select --install &> /dev/null
+
+  until $(xcode-select --print-path &> /dev/null); do
+    sleep 5;
+  done
+fi
+e_success "XCode Command Line Tools installed"
+
+# Install Homebrew
+if test ! $(which brew); then
+  e_pending "Installing Homebrew"
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  brew doctor
+  brew tap homebrew/cask-fonts
+fi
+e_success "Homebrew installed"
+
+e_message "Setup complete!"

@@ -1,3 +1,96 @@
+has_command() {
+  if [ $(type -P $1) ]; then
+    return 0
+  fi
+  return 1
+}
+
+test_command() {
+  if has_command $1; then
+    e_success "$1"
+  else
+    e_failure "$1"
+  fi
+}
+
+has_brew() {
+  if $(brew ls --versions $1 > /dev/null); then
+    return 0
+  fi
+  return 1
+}
+
+test_brew() {
+  if has_brew $1; then
+    e_success "$1"
+  else
+    e_failure "$1"
+  fi
+}
+
+has_path() {
+  local path="$@"
+  if [ -e "$HOME/$path" ]; then
+    return 0
+  fi
+  return 1
+}
+
+test_path() {
+  if has_path $1; then
+    e_success "$1"
+  else
+    e_failure "$1"
+  fi
+}
+
+has_cask() {
+  if $(brew ls --cask $1 &> /dev/null); then
+    return 0
+  fi
+  return 1
+}
+
+test_cask() {
+  if has_cask $1; then
+    e_success "$1"
+  else
+    e_failure "$1"
+  fi
+}
+
+has_app() {
+  local name="$@"
+  if [ -e "/Applications/$name.app" ]; then
+    return 0
+  fi
+  return 1
+}
+
+test_app() {
+  if has_app $1; then
+    e_success "$1"
+  else
+    e_failure "$1"
+  fi
+}
+
+is_arm() {
+  if [[ $(uname -p) == 'arm' ]]; then
+    return 0
+  fi
+  return 1
+}
+
+has_variable() {
+  if [[ ${!1} == true ]]; then
+    return 0
+  fi
+  return 1
+}
+
+
+
 #!/bin/zsh
 
 color_reset=$(tput sgr0)
