@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source _logger.sh
+source _utils.sh
 
 e_message "Starting setup..."
 
@@ -35,6 +36,7 @@ e_success "XCode Command Line Tools installed"
 if ! $(which brew &> /dev/null); then
   e_pending "Installing Homebrew"
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" &> /dev/null
+  zshrc "eval $(/opt/homebrew/bin/brew shellenv)" "Homebrew"
   brew doctor
   brew tap homebrew/cask-fonts
 fi
