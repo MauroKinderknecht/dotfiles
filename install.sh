@@ -2,11 +2,6 @@
 
 source _logger.sh
 
-e_message "Starting setup..."
-
-# Create .zshrc file
-touch ~/.zshrc
-
 # Update repo if cloned with git
 if $(which git &> /dev/null); then
   if [ -d .git ]; then
@@ -17,5 +12,3 @@ if $(which git &> /dev/null); then
 fi
 
 source base.sh
-
-e_message "Setup complete!"

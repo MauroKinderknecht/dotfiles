@@ -2,6 +2,11 @@
 
 source _logger.sh
 
+e_message "Starting setup..."
+
+# Create .zshrc file
+touch ~/.zshrc
+
 # Install XCode Command Line Tools
 if ! $(xcode-select --print-path &> /dev/null); then
   e_pending "Installing XCode Command Line Tools"
@@ -21,3 +26,5 @@ if ! $(which brew &> /dev/null); then
   brew tap homebrew/cask-fonts
 fi
 e_success "Homebrew installed"
+
+e_message "Setup complete!"
