@@ -37,6 +37,7 @@ if ! $(which brew &> /dev/null); then
   e_pending "Installing Homebrew"
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" &> /dev/null
   zshrc 'eval "$(/opt/homebrew/bin/brew shellenv)"' "Homebrew"
+  zsh &
   brew doctor
   brew tap homebrew/cask-fonts
 fi
