@@ -29,7 +29,7 @@ e_success "XCode Command Line Tools installed"
 # Install Homebrew
 if ! $(which brew); then
   e_pending "Installing Homebrew"
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   brew doctor
   brew tap homebrew/cask-fonts
 fi
