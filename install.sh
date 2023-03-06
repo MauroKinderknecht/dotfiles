@@ -148,7 +148,7 @@ zshrc() {
     echo "# $2" >> $HOME/.zshrc
   fi
   echo $1 >> $HOME/.zshrc
-  source $HOME/.zshrc
+  source $HOME/.zshrc &
 }
 
 has_variable() {
@@ -170,8 +170,14 @@ if ! [[ "${OSTYPE}" == "darwin"* ]]; then
   exit 1
 fi
 
+if ! has_path ".zshrc"; then
+  touch $HOME/.zshrc
+  touch $HOME/.zprofile
+fi
+
 # Source zshrc to make sure we have all existing config available
-zsh & source ~/.zshrc &
+zsh & 
+source ~/.zshrc &
 
 e_message "Setting macOS defaults"
 
@@ -267,7 +273,7 @@ fi
 
 if ! has_command "direnv"; then
   brew_install "direnv"
-  zshrc 'eval "$(direnv hook zsh)"' "direnv config"
+  zshrc 'eval "$(direnv hook $SHELL)"' "direnv config"
 fi
 
 brew_install "thefuck"
@@ -442,13 +448,13 @@ brew_install "zsh"
 if has_command "zsh"; then
   if ! has_path ".oh-my-zsh"; then
     e_pending "Installing oh-my-zsh"
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended &
     mv ~/.zshrc.pre-oh-my-zsh ~/.zshrc
     zshrc 'export ZSH="$HOME/.oh-my-zsh"' "oh-my-zsh config"
     zshrc 'ZSH_THEME="tesseract"'
     zshrc 'plugins=(1password aws brew docker docker-compose gcloud gh git golang helm kubectl npm nvm python sdk sudo terraform thefuck)'
     zshrc 'source $ZSH/oh-my-zsh.sh'
-    source ~/.zshrc
+    source ~/.zshrc & 
     cat >> ~/.oh-my-zsh/custom/themes/tesseract.zsh-theme << '_EOF_'
     autoload -Uz add-zsh-hook
 
