@@ -244,7 +244,7 @@ e_success "xcode-select installed"
 # Install Homebrew
 if ! has_command "brew"; then
   e_pending "Installing brew (Homebrew)"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" > /dev/null
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   if has_arm; then
     zprofile 'eval "$(/opt/homebrew/bin/brew shellenv)"' "homebrew"
     eval "$(/opt/homebrew/bin/brew shellenv)"
