@@ -171,8 +171,8 @@ if ! [[ "${OSTYPE}" == "darwin"* ]]; then
 fi
 
 # Source zshrc to make sure we have all existing config available
-source ~/.zshrc
 zsh
+source ~/.zshrc
 
 e_message "Setting macOS defaults"
 
