@@ -11,12 +11,14 @@ if ! [[ "${OSTYPE}" == "darwin"* ]]; then
 fi
 
 # Ask for sudo access and keep it alive
+e_pending "Requesting sudo access"
 sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+e_success "Sudo access granted"
 
 # Create .zshrc file
 touch ~/.zshrc
-zsh
+zsh &
 
 # Install XCode Command Line Tools
 if ! $(xcode-select --print-path &> /dev/null); then
