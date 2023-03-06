@@ -284,8 +284,6 @@ if ! has_brew "git"; then
   [core]
       editor = code -n -w
       autocrlf = input
-  [url "ssh://git@github.com/"]
-      insteadOf = https://github.com/
   [rerere]
     enabled = true
   [color]
