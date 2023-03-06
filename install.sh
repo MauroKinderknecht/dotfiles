@@ -233,17 +233,10 @@ e_success "~/files folder created"
 
 e_message "Installing base tools"
 
-# Install Xcode Command Line Tools
-if ! has_command "xcode-select"; then
-  e_pending "Installing xcode-select"
-  xcode-select --install
-  test_command "xcode-select"
-fi
-e_success "xcode-select installed"
-
 # Install Homebrew
 if ! has_command "brew"; then
   e_pending "Installing brew (Homebrew)"
+  xcode-select --install &
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   if has_arm; then
     zprofile 'eval "$(/opt/homebrew/bin/brew shellenv)"' "homebrew"
