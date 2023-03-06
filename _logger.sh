@@ -21,6 +21,11 @@ e_success() {
   printf "\n"
 }
 
+e_info() {
+  printf "${color_blue}ℹ️  %s${color_reset}" "$@"
+  printf "\n"
+}
+
 e_message() {
   printf "\n"
   printf "${color_blue}✨  %s${color_reset}" "$@"
