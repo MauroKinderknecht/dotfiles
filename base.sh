@@ -4,8 +4,19 @@ source _logger.sh
 
 e_message "Starting setup..."
 
+# Check if MacOS
+if ! [[ "${OSTYPE}" == "darwin"* ]]; then
+  e_failure "Unsupported operating system. This setup is only available for MacOS"
+  exit 1
+fi
+
+# Ask for sudo access and keep it alive
+sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 # Create .zshrc file
 touch ~/.zshrc
+zsh
 
 # Install XCode Command Line Tools
 if ! $(xcode-select --print-path &> /dev/null); then
