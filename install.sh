@@ -6,10 +6,13 @@ e_message "Starting setup..."
 # Create .zshrc file
 touch ~/.zshrc
 
-# if exists .git in this dir
-if [ -d .git ]; then
-  e_pending "Updating dotfiles"
-  git pull origin main
+# Update repo if cloned with git
+if $(which git); then
+  if [ -d .git ]; then
+    e_pending "Updating dotfiles"
+    git pull origin main &> /dev/null
+  fi
+  e_success "Dotfiles updated"
 fi
 
 # Install XCode Command Line Tools
