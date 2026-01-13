@@ -1,7 +1,11 @@
 #!/bin/bash
 
-source _logger.sh
-source _utils.sh
+# macOS-specific defaults and configuration
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+source "$DOTFILES_DIR/_logger.sh"
+source "$DOTFILES_DIR/_utils.sh"
 
 e_message "Setting macOS defaults"
 
@@ -17,7 +21,7 @@ defaults write NSGlobalDomain AppleShowScrollBars -string "WhenScrolling"
 # Save to disk (not to iCloud) by default
 defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 
-# Disable the “Are you sure you want to open this application?” dialog
+# Disable the "Are you sure you want to open this application?" dialog
 defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Disable Resume system-wide so a restart is a true restart

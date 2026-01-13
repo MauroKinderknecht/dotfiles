@@ -6,15 +6,13 @@ Warning: If you want to give these dotfiles a try, you should first fork this re
 
 ### Using git
 
-```
-git clone https://github.com/maurokinderknecht/dotfiles.git && cd dotfiles && source bootstrap.sh
+```sh
+git clone https://github.com/maurokinderknecht/dotfiles.git && cd dotfiles && source install.sh
 ```
 
 ### Git-free install
 
-```
+```sh
 cd; mkdir .dotfiles; cd .dotfiles; curl -#L https://github.com/maurokinderknecht/dotfiles/tarball/main | tar -xzv --strip-components 1
-source base.sh
+source install.sh
 ```
-
-
