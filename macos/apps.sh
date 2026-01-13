@@ -22,7 +22,7 @@ brew_install "thefuck"
 
 if ! has_command "direnv"; then
   brew_install "direnv"
-  zshrc 'eval "$(direnv hook $SHELL)"' "direnv config"
+  zshrc 'eval "$(direnv hook zsh)"' "direnv config"
 fi
 
 e_message "Installing apps"

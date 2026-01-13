@@ -42,7 +42,7 @@ zshrc() {
     echo "# $2" >> ~/.zshrc
   fi
   echo "$1" >> ~/.zshrc
-  source $HOME/.zshrc
+  # Note: Don't source .zshrc here - script runs in bash, zshrc has zsh-specific commands
 }
 
 has_path() {

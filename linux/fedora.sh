@@ -22,6 +22,15 @@ dnf_install "gcc-c++"
 dnf_install "make"
 dnf_install "ca-certificates"
 
+# Install zsh and set as default shell
+e_message "Setting up Zsh"
+dnf_install "zsh"
+if [[ "$SHELL" != *"zsh"* ]]; then
+  e_pending "Setting zsh as default shell"
+  sudo chsh -s "$(which zsh)" "$USER"
+  e_success "Zsh set as default shell (restart terminal to use)"
+fi
+
 e_message "Installing development tools"
 
 # Common development tools
